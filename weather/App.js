@@ -69,7 +69,7 @@ export default class App extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         {/* 
-          comsumize statusBar words text color 
+          customize statusBar text color 
         */}
         <StatusBar barStyle="light-content" />
         <ImageBackground
