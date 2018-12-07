@@ -1,33 +1,80 @@
 import React from 'react';
 
 import { StyleSheet, View, ScrollView, Text } from 'react-native'; 
+import uuidv4 from 'uuid/v4'
+import { newTimer } from './utils/TimerUtils';
 
 import EditableTimer from './components/EditableTimer';
 import ToggleableTimerForm from './components/ToggleableTimerForm';
 
 export default class App extends React.Component {
+  state = {
+    timers: [
+      {
+        title: 'Mow the lawn',
+        project :"House Chores",
+        id: uuidv4(),
+        elapsed: 5456099,
+        isRunning: true,
+      },
+      {
+        title: 'Back squash',
+        projeect: 'Kitchen Chores',
+        id: uuidv4(),
+        elapsed: 1273998,
+        isRunning: false,
+      }
+    ]
+  }
+
+handleCreateFormSubmit = timer => {
+  const { timers } = this.state;
+
+  this.setState({
+    timers: [newTimer(timer), ...timers],
+  })
+}
+
+handleFormSubmit = attrs => {
+  const { timers } = this.state;
+
+  this.setState({
+    timers: timers.map(timer => {
+      if (timer.id === attrs.id) {
+        const { title, project} = attrs;
+
+        return {
+          ...timer,
+          title,
+          project,
+        };
+      }
+
+      return timer;
+    })
+  })
+}
+
   render() {
+    const { timers } = this.state;
     return (
       <View style={styles.appContainer}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Timers</Text>
         </View>
         <ScrollView>
-          <ToggleableTimerForm isOpen={false} />
-          <EditableTimer 
-            id="1"
-            title="Mow the lawn"
-            project="House Chores"
-            elapsed="8986300"
-            isRunning
-          />
-          <EditableTimer 
-            id="2"
-            title="Bake squash"
-            project="Kitchen Chores"
-            elapsed="3890985"
-            editFormOpen
-          />
+          <ToggleableTimerForm onFormSubmit={this.handleCreateFormSubmit}/>
+          {timers.map(({ title, project, id, elapsed, isRunning }) => (
+             <EditableTimer 
+             key={id}
+             id={id}
+             title={title}
+             project={project}
+             elapsed={elapsed}
+             isRunning={isRunning}
+             onFormSubmit={this.handleFormSubmit}
+           />
+          ))}
         </ScrollView>
       </View>
     );
