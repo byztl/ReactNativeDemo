@@ -1,10 +1,23 @@
 import React from 'react';
 import { StyleSheet, TextInput, View, Text} from 'react-native';
 
+import PropTypes from 'prop-types';
 import TimerForm from './TimerForm';
 import Timer from './Timer';
 
 export default class EditableTimer extends React.Component {
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    project: PropTypes.string.isRequired,
+    elapsed: PropTypes.number.isRequired,
+    isRunning: PropTypes.bool.isRequired,
+    onFormSubmit: PropTypes.func.isRequired,
+    onRemovePress: PropTypes.func.isRequired,
+    onStartPress: PropTypes.func.isRequired,
+    onStopPress: PropTypes.func.isRequired,
+};
+
 
   state = {
     editFormOpen: false,
@@ -20,9 +33,8 @@ export default class EditableTimer extends React.Component {
 
   handleSubmit = timer => {
     const { onFormSubmit } = this.props;
-
-    onFormSubmit(timer);
-    this.closeForm;
+    onFormSubmit(timer);  // timer 接受的是 TimerForm 传来的参数, 三个实参被自动装箱成一个形参 (ES6语法)
+    this.closeForm();
   };
 
   closeForm = () => {
@@ -34,7 +46,15 @@ export default class EditableTimer extends React.Component {
   };
 
   render() {
-    const { id, title, project, elapsed, isRunning } = this.props;
+    const { id, 
+            title, 
+            project, 
+            elapsed, 
+            isRunning, 
+            onTimerRemove, 
+            onStartPress,
+            onStopPress,
+          } = this.props;
     const { editFormOpen } = this.state;
     if (editFormOpen) {
       return <TimerForm 
@@ -53,6 +73,9 @@ export default class EditableTimer extends React.Component {
         elapsed={elapsed}
         isRunning={isRunning}
         onEditPress={this.handleEditPress}
+        onRemovePress={onTimerRemove}
+        onStartPress={onStartPress}
+        onStopPress={onStopPress}
       />
     )
   }
