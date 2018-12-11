@@ -10,7 +10,6 @@ export default class Timer extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    project: PropTypes.string.isRequired,
     elapsed: PropTypes.number.isRequired,
     isRunning: PropTypes.bool.isRequired,
     onEditPress: PropTypes.func.isRequired,
