@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Image, StyleSheet, View} from 'react-native';
+import { Image, StyleSheet, View, ActivityIndicator} from 'react-native';
 
 import AuthorRow from './AuthorRow';
 
 export default class Card extends React.Component {
   static propTypes = {
-    fullName: PropTypes.string.isRequired,
+    fullname: PropTypes.string.isRequired,
     image: Image.propTypes.source.isRequired,
     linkText: PropTypes.string,
     onPressLinkText: PropTypes.func,
@@ -17,17 +17,36 @@ export default class Card extends React.Component {
     onPressLinkText: () => {},
   }
 
+  state = {
+    loading: true,
+  };
+
+  handleLoad = () => {
+    this.setState({ loading: false });
+  }
+
   render() {
-    const { fullName, image, linkText, onPressLinkText } = this.props;
+    const { fullname, image, linkText, onPressLinkText } = this.props;
+    const { loading } = this.state;
 
     return (
       <View>
         <AuthorRow 
-          fullname={fullName}
+          fullname={fullname}
           linkText={linkText}
           onPressLinkText={onPressLinkText}
         />
-        <Image style={styles.image} source={image} />
+        <View style={styles.image}>
+          {loading && (
+            <ActivityIndicator animating={loading} style={StyleSheet.absoluteFill} size={'large'}/>
+          )}
+          <Image
+            style={StyleSheet.absoluteFill}
+            source={image}
+            onLoad={this.handleLoad}
+            horizontal={true}
+          />
+        </View>
       </View>
     )
   }
