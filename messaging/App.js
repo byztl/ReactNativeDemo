@@ -1,14 +1,61 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 
+import MessageList from './components/MessageList';
+import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
 import Status from './components/Status';
+
 
 
 export default class App extends React.Component {
 
-  renderMessageList() {
-    return <View style={styles.content}></View>
+  state = {
+    messages: [
+      createImageMessage('http://a.hiphotos.baidu.com/zhidao/pic/item/ae51f3deb48f8c548cbb8b3a3a292df5e0fe7fbe.jpg'),
+      createTextMessage('World'),
+      createTextMessage('Hello'),
+      createLocationMessage({
+        latitude: 37.78825,
+        longitude: -122.4324,
+      }),
+    ],
   };
+
+  handlePressMessage = ({ id, type}) => {
+    switch (type) {
+      case 'text':
+        Alert.alert(
+          'Delete message?',
+          'Are you sure you want to permanently delete this message?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => {
+                const { messages } = this.state;
+                this.setState({messages: messages.filter(message => message.id !== id)});
+              }
+            }
+          ]
+        )
+    }
+  }
+
+
+
+  renderMessageList() {
+    const { messages } = this.state;
+
+    return (
+      <View style={styles.content}>
+        <MessageList messages={messages} onPressMessage={this.handlePressMessage} />
+      </View>
+    );
+  }
 
   renderInputMethoidEditor() {
     return (
