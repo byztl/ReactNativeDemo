@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert, Image, TouchableHighlight } from 'react-native';
 
+import Toolbar from './components/Toolbar';
 import MessageList from './components/MessageList';
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
 import Status from './components/Status';
@@ -19,8 +20,50 @@ export default class App extends React.Component {
         longitude: -122.4324,
       }),
     ],
+    fullscreenImageId: null,
+    isInputFocused: false,
   };
 
+  handlePressToolbarCamera = () => {
+
+  } 
+
+  handlePressToolbarLocation = () => {
+
+  }
+  
+  handleChangeFocus = (isFocused) => {
+    this.setState({ isInputFocused: isFocused });
+  }
+
+  handleSubmit = (text) => {
+    const { messages } = this.state;
+
+    this.setState({
+      messages: [createTextMessage(text), ...messages],
+    });
+  }
+
+  renderToolbar() {
+    alert('test');
+    const { isInputFocused } = this.state;
+
+    return (
+      <View style={styles.toolbar}>
+        <Toolbar 
+          isFocused={isInputFocused}
+          onSubmit={this.handleSubmit}
+          onChangeFocus={this.handleChangeFocus}
+          onPressCamera={this.handlePressToolbarCamera}
+          onPressLocaiont={this.handlePressToolbarLocation}
+        />
+      </View>
+    )
+  }
+  dismissFullscreenImage = () => {
+    this.setState({ fullscreenImageId: null });
+  }
+ 
   handlePressMessage = ({ id, type}) => {
     switch (type) {
       case 'text':
@@ -32,8 +75,7 @@ export default class App extends React.Component {
               text: 'Cancel',
               style: 'cancel',
             },
-            {
-              text: 'Delete',
+            { text: 'Delete',
               style: 'destructive',
               onPress: () => {
                 const { messages } = this.state;
@@ -42,7 +84,31 @@ export default class App extends React.Component {
             }
           ]
         )
+        break;
+      case 'image':
+        this.setState({ fullscreenImageId: id });
+        break;
+      default:
+        break;
     }
+  }
+
+  renderFullscreenImage = () => {
+    const { messages, fullscreenImageId } = this.state;
+
+    if (!fullscreenImageId) return null;
+
+    const image = messages.find(message => message.id === fullscreenImageId);
+
+    if (!image) return null;
+
+    const { uri } = image;
+
+    return (
+      <TouchableHighlight style={styles.fullscrenOverlay} onPress={this.dismissFullscreenImage}>
+        <Image style={styles.fullscreenImage} source={{ uri }}/>
+      </TouchableHighlight>
+    )
   }
 
 
@@ -76,6 +142,7 @@ export default class App extends React.Component {
         {this.renderMessageList()}
         {this.renderToolbar()}
         {this.renderInputMethoidEditor()}
+        {this.renderFullscreenImage()}
       </View>
     );
   }
@@ -99,5 +166,14 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(0,0,0,0.04)',
     borderBottomColor: 'rgba(0,0,0,0.04)',
     backgroundColor: 'white',
+  },
+  fullscrenOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'black',
+    zIndex: 2,
+  },
+  fullscreenImage: {
+    flex: 1,
+    resizeMode: 'contain',
   }
 });
